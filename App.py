@@ -1,64 +1,63 @@
-
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
-from pyngrok import ngrok
-from google.colab import drive
 
-@st.cache_resource
-def load_customers_data():
-    return pd.read_csv("/content/gdrive/MyDrive/E-Commerce Public Dataset/customers_dataset.csv", sep=',')
+# Function to load data from uploaded files
+def load_data():
+    uploaded_customers = st.file_uploader("Upload Customers Dataset", type=["csv"])
+    uploaded_products = st.file_uploader("Upload Products Dataset", type=["csv"])
+    uploaded_orders = st.file_uploader("Upload Orders Dataset", type=["csv"])
 
-@st.cache_resource
-def load_products_data():
-    return pd.read_csv("/content/gdrive/MyDrive/E-Commerce Public Dataset/products_dataset.csv", sep=',')
+    if uploaded_customers is not None and uploaded_products is not None and uploaded_orders is not None:
+        customers_data = pd.read_csv(uploaded_customers)
+        products_data = pd.read_csv(uploaded_products)
+        orders_data = pd.read_csv(uploaded_orders)
+        return customers_data, products_data, orders_data
+    else:
+        return None, None, None
 
-@st.cache_resource
-def load_orders_data():
-    return pd.read_csv("/content/gdrive/MyDrive/E-Commerce Public Dataset/order_items_dataset.csv", sep=',')
-customers_data = load_customers_data()
-products_data = load_products_data()
-orders_data = load_orders_data()
-#Judul Dashboard
-st.title("Business Orders Dashboard")
+# Load data
+customers_data, products_data, orders_data = load_data()
 
-# 1. 5 kota (state) yang memiliki pesanan (orders) terbanyak
-st.header("1. 10 kota (state) yang memiliki pesanan (orders) terbanyak?")
+if customers_data is not None and products_data is not None and orders_data is not None:
+    # Title of the Dashboard
+    st.title("Business Orders Dashboard")
 
-# mengelompokkan kota dan menjumlahkan pesanannya
-state_order_counts = customers_data.groupby("customer_state")["customer_id"].count().reset_index()
-state_order_counts.columns = ["State", "Number of Orders"]
-state_order_counts = state_order_counts.sort_values(by="Number of Orders", ascending=False)
+    # 1. 10 states with the highest number of orders
+    st.header("1. 10 States with the Highest Number of Orders")
 
-# menampilkan 5 kota yang memiliki pesanan terbanyak
-st.subheader("Top States by Number of Orders")
-st.write(state_order_counts.head(5))
+    # Grouping states and counting orders
+    state_order_counts = customers_data.groupby("customer_state")["customer_id"].count().reset_index()
+    state_order_counts.columns = ["State", "Number of Orders"]
+    state_order_counts = state_order_counts.sort_values(by="Number of Orders", ascending=False)
 
-# menampilkan bar chart
-fig_state_orders = px.bar(state_order_counts, x="State", y="Number of Orders",
-                          title="State-wise Number of Orders", color="Number of Orders")
-st.plotly_chart(fig_state_orders)
+    # Display the top states
+    st.subheader("Top States by Number of Orders")
+    st.write(state_order_counts.head(10))  # Changed to 10
 
-# Berapa total harga pesanan per kategori produk?
-st.header("2. Berapa total harga pesanan per kategori produk?")
+    # Displaying bar chart
+    fig_state_orders = px.bar(state_order_counts.head(10), x="State", y="Number of Orders",
+                              title="State-wise Number of Orders", color="Number of Orders")
+    st.plotly_chart(fig_state_orders)
 
-# mennggabungkan orders_data dan products_data
-merged_data = pd.merge(orders_data, products_data, on="product_id", how="left")
+    # 2. Total order price by product category
+    st.header("2. Total Order Price by Product Category")
 
-# menggelompokkan product percategory product dan menjumlahkan harga pesanannya
-category_price_totals = merged_data.groupby("product_category_name")["price"].sum().reset_index()
-category_price_totals.columns = ["Product Category", "Total Order Price"]
-category_price_totals = category_price_totals.sort_values(by="Total Order Price", ascending=False)
+    # Merging orders_data and products_data
+    merged_data = pd.merge(orders_data, products_data, on="product_id", how="left")
 
+    # Grouping by product category and summing prices
+    category_price_totals = merged_data.groupby("product_category_name")["price"].sum().reset_index()
+    category_price_totals.columns = ["Product Category", "Total Order Price"]
+    category_price_totals = category_price_totals.sort_values(by="Total Order Price", ascending=False)
 
-# Menampilkan 10 kategori teratas berdasarkan total harga pesanan
-st.subheader("Top 10 Product Categories by Total Order Price")
-st.write(category_price_totals.head(10))
+    # Displaying the top product categories
+    st.subheader("Top 10 Product Categories by Total Order Price")
+    st.write(category_price_totals.head(10))
 
-# membuat bar chart untuk total harga berdasarkan kategori produk
-fig_category_price = px.bar(category_price_totals.head(10), x="Product Category", y="Total Order Price",
-                            title="Top 10 Product Categories by Total Order Price", color="Total Order Price")
-st.plotly_chart(fig_category_price)
-
+    # Creating a bar chart for total prices by product category
+    fig_category_price = px.bar(category_price_totals.head(10), x="Product Category", y="Total Order Price",
+                                title="Top 10 Product Categories by Total Order Price", color="Total Order Price")
+    st.plotly_chart(fig_category_price)
+else:
+    st.info("Please upload the datasets to visualize the dashboard.")
