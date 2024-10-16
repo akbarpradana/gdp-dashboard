@@ -21,9 +21,9 @@ Original file is located at
 ## Import Semua Packages/Library yang Digunakan
 """
 
-!pip install pandas
-!pip install plotly
-!pip install streamlit -q
+pip install pandas
+pip install plotly
+pip install streamlit -q
 
 
 import streamlit as st
@@ -33,11 +33,8 @@ import plotly.graph_objects as go
 
 from google.colab import drive
 
-!pip install pipreqs
+pip install pipreqs
 
-!wget -q -o - ipv4.icanhazip.com
-
-! streamlit run app.py &npx localtunnel --port 8501
 
 drive.mount('/content/gdrive')
 
