@@ -1,22 +1,27 @@
 import streamlit as st
 import pandas as pd
 
-# Function to load data from uploaded files
-def load_data():
-    uploaded_customers = st.file_uploader("Upload Customers Dataset", type=["csv"])
-    uploaded_products = st.file_uploader("Upload Products Dataset", type=["csv"])
-    uploaded_orders = st.file_uploader("Upload Orders Dataset", type=["csv"])
+# Function to load data from GitHub
+@st.cache_resource
+def load_data_from_github():
+    customers_url = 'https://raw.githubusercontent.com/akbarpradana/gdp-dashboard/main/data/customers_dataset.csv'  # CSV file
+    products_url = 'https://raw.githubusercontent.com/akbarpradana/gdp-dashboard/main/data/products_dataset.csv'  # Excel file
+    orders_url = 'https://raw.githubusercontent.com/akbarpradana/gdp-dashboard/main/data/order_items_dataset.csv'  # Excel file
 
-    if uploaded_customers is not None and uploaded_products is not None and uploaded_orders is not None:
-        customers_data = pd.read_csv(uploaded_customers)
-        products_data = pd.read_csv(uploaded_products)
-        orders_data = pd.read_csv(uploaded_orders)
+    try:
+        # Load the CSV file
+        customers_data = pd.read_csv(customers_url)
+        # Load the Excel files
+        products_data = pd.read_csv(products_url)
+        orders_data = pd.read_csv(orders_url)
+
         return customers_data, products_data, orders_data
-    else:
+    except Exception as e:
+        st.error(f"Error loading data: {e}")
         return None, None, None
 
 # Load data
-customers_data, products_data, orders_data = load_data()
+customers_data, products_data, orders_data = load_data_from_github()
 
 if customers_data is not None and products_data is not None and orders_data is not None:
     # Title of the Dashboard
@@ -32,7 +37,7 @@ if customers_data is not None and products_data is not None and orders_data is n
 
     # Display the top states
     st.subheader("Top States by Number of Orders")
-    st.write(state_order_counts.head(10))  # Changed to 10
+    st.write(state_order_counts.head(10))
 
     # Displaying bar chart using Streamlit
     st.bar_chart(state_order_counts.set_index("State")["Number of Orders"].head(10))
@@ -55,4 +60,4 @@ if customers_data is not None and products_data is not None and orders_data is n
     # Creating a bar chart for total prices by product category using Streamlit
     st.bar_chart(category_price_totals.set_index("Product Category")["Total Order Price"].head(10))
 else:
-    st.info("Please upload the datasets to visualize the dashboard.")
+    st.info("Data could not be loaded. Please check the file paths.")
