@@ -1,7 +1,5 @@
-
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 
 # Function to load data from uploaded files
 def load_data():
@@ -36,10 +34,8 @@ if customers_data is not None and products_data is not None and orders_data is n
     st.subheader("Top States by Number of Orders")
     st.write(state_order_counts.head(10))  # Changed to 10
 
-    # Displaying bar chart
-    fig_state_orders = px.bar(state_order_counts.head(10), x="State", y="Number of Orders",
-                              title="State-wise Number of Orders", color="Number of Orders")
-    st.plotly_chart(fig_state_orders)
+    # Displaying bar chart using Streamlit
+    st.bar_chart(state_order_counts.set_index("State")["Number of Orders"].head(10))
 
     # 2. Total order price by product category
     st.header("2. Total Order Price by Product Category")
@@ -56,9 +52,7 @@ if customers_data is not None and products_data is not None and orders_data is n
     st.subheader("Top 10 Product Categories by Total Order Price")
     st.write(category_price_totals.head(10))
 
-    # Creating a bar chart for total prices by product category
-    fig_category_price = px.bar(category_price_totals.head(10), x="Product Category", y="Total Order Price",
-                                title="Top 10 Product Categories by Total Order Price", color="Total Order Price")
-    st.plotly_chart(fig_category_price)
+    # Creating a bar chart for total prices by product category using Streamlit
+    st.bar_chart(category_price_totals.set_index("Product Category")["Total Order Price"].head(10))
 else:
     st.info("Please upload the datasets to visualize the dashboard.")
