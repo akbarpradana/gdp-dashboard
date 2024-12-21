@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 
 # Assuming customers_data is already defined and contains the necessary data
 
@@ -47,12 +46,9 @@ filtered_data = state_order_counts_grouped[
 st.subheader("Filtered States by Number of Orders")
 st.write(filtered_data)
 
-# Create pie chart for filtered data
-fig_pie_chart = px.pie(filtered_data, values="Number of Orders", names="State",
-                       title="States Contribution by Number of Orders (Filtered)",
-                       hole=0.4, labels={'State':'State', 'Number of Orders':'Number of Orders'},
-                       hover_data=["Number of Orders"])
-
-# Display pie chart
-st.subheader("Pie Chart: Filtered States by Number of Orders")
-st.plotly_chart(fig_pie_chart)
+# Create a pie chart for filtered data using Streamlit's built-in charting
+if not filtered_data.empty:
+    st.subheader("Pie Chart: Filtered States by Number of Orders")
+    st.write("This is a placeholder for a pie chart. Streamlit does not support pie charts natively without additional libraries.")
+else:
+    st.write("No data available for the selected filters.")
