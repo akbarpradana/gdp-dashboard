@@ -52,12 +52,15 @@ filtered_data = state_order_counts_grouped[
 st.subheader("Filtered States by Number of Orders")
 st.write(filtered_data)
 
-# Create a pie chart-like visualization using a bar chart
-# Calculate proportions
+# Create a bar chart visualization
 if not filtered_data.empty:
     filtered_data['Proportion'] = filtered_data['Number of Orders'] / filtered_data['Number of Orders'].sum()
-    st.subheader("Pie Chart: Filtered States by Number of Orders (as Bar Chart)")
+    st.subheader("Bar Chart: Filtered States by Number of Orders (as Bar Chart)")
     st.bar_chart(filtered_data.set_index('State')['Proportion'])
+
+    # Create a pie chart visualization
+    st.subheader("Pie Chart: Filtered States by Number of Orders")
+    st.pyplot(filtered_data.set_index('State')['Number of Orders'].plot.pie(autopct='%1.1f%%', startangle=90))
 else:
     st.warning("No data available for the selected filters.")
 
