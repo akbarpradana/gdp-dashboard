@@ -55,9 +55,9 @@ st.write(filtered_data)
 # Create a gantt chart-like visualization using a bar chart
 # Calculate proportions
 if not filtered_data.empty:
-    filtered_data['Proportion'] = filtered_data['Number of Orders'] / filtered_data['Number of Orders'].sum()
+
     st.subheader("Bar Chart: Filtered States by Number of Orders (as Bar Chart)")
-    st.bar_chart(filtered_data.set_index('State')['Proportion'])
+    st.bar_chart(filtered_data.set_index('State')['Number of Orders'])
 else:
     st.warning("No data available for the selected filters.")
 
